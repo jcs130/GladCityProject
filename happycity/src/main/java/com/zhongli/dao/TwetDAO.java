@@ -1,5 +1,8 @@
 package com.zhongli.dao;
 
+import java.sql.Time;
+import java.util.List;
+
 import com.zhongli.model.TwetMsg;
 
 /**
@@ -35,4 +38,21 @@ public interface TwetDAO {
 	 */
 	public TwetMsg findByMaxID();
 	
+	/**
+	 * 根据传入的参数读取指定的数据
+	 * @param location_lat1
+	 * @param location_lan1
+	 * @param location_lat2
+	 * @param location_lan2
+	 * @param year_start
+	 * @param year_end
+	 * @param month_start
+	 * @param month_end
+	 * @param day_start
+	 * @param day_end
+	 * @param time_start
+	 * @param tame_end
+	 * @return
+	 */
+	public List<TwetMsg> findByParameters(double location_lat1,double location_lan1,double location_lat2,double location_lan2,int year_start,int year_end,int month_start,int month_end,int day_start,int day_end,Time time_start,Time tame_end,String language,String emotion);
 }

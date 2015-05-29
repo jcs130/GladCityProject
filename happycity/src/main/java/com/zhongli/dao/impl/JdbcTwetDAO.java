@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Time;
+import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -144,5 +146,20 @@ public class JdbcTwetDAO implements TwetDAO {
 			}
 		}
 	}
+
+	@Override
+	public List<TwetMsg> findByParameters(double location_lat1,
+			double location_lan1, double location_lat2, double location_lan2,
+			int year_start, int year_end, int month_start, int month_end,
+			int day_start, int day_end, Time time_start, Time tame_end,String language,String emotion) {
+		//1.首先根据经纬度选择表
+		
+		
+		
+		
+		
+		return null;
+	}
+
 
 }
