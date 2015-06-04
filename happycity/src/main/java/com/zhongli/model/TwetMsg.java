@@ -18,7 +18,8 @@ public class TwetMsg {
 
 	public TwetMsg(String userName, String msg, String week, String month,
 			int day, String time, String timeZone, int year,
-			double location_lat, double location_lon, String language,String emontion) {
+			double location_lat, double location_lon, String language,
+			String emontion) {
 		this.userName = userName;
 		this.msg = msg;
 		this.week = week;
@@ -29,11 +30,12 @@ public class TwetMsg {
 		this.year = year;
 		this.location = new double[] { location_lat, location_lon };
 		this.language = language;
-		this.emotion=emontion;
+		this.emotion = emontion;
 	}
 
 	/**
 	 * 分析原始信息得到对象
+	 * 
 	 * @param rawTwet
 	 */
 	public TwetMsg(String rawTwet) {
@@ -51,6 +53,21 @@ public class TwetMsg {
 		this.location = new double[] { Double.parseDouble(loc[0]),
 				Double.parseDouble(loc[1]) };
 		this.language = info[4];
+	}
+
+	public TwetMsg(String username, String msg, String datetime,
+			double latitude, double longitude, String lang) {
+		this.userName = username;
+		this.msg = msg;
+		String times[] = datetime.split(" ");
+		this.week = times[0];
+		this.month = times[1];
+		this.day = Integer.parseInt(times[2]);
+		this.time = times[3];
+		this.timeZone = times[4];
+		this.year = Integer.parseInt(times[5]);
+		this.location = new double[] { latitude, longitude };
+		this.language = lang;
 	}
 
 	public String getUserName() {
@@ -96,8 +113,6 @@ public class TwetMsg {
 	public String getEmotion() {
 		return emotion;
 	}
-
-	
 
 	@Override
 	public String toString() {

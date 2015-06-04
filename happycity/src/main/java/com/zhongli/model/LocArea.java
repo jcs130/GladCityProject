@@ -7,14 +7,15 @@ package com.zhongli.model;
  *
  */
 public class LocArea {
-	double north;
-	double south;
-	double west;
-	double east;
-	String locName;
-	int locID;
-	LocPoint center;
-	int range;
+	private double north;
+	private double south;
+	private double west;
+	private double east;
+	private String locName;
+	private int regID;
+	private int locID;
+	private LocPoint center;
+	private int range;
 
 	public LocArea(double north, double west, double south, double east,
 			String locName) {
@@ -87,5 +88,14 @@ public class LocArea {
 	public int getRange() {
 		return range;
 	}
+
+	public int getRegID() {
+		return regID;
+	}
+
+	public void setRegID(int regID) {
+		this.regID = regID;
+	}
+
 
 }
