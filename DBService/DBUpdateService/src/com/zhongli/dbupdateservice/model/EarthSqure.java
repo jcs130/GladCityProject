@@ -1,6 +1,4 @@
-package com.zhongli.model;
-
-import java.util.ArrayList;
+package com.zhongli.dbupdateservice.model;
 
 /**
  * Stream区块类
@@ -15,6 +13,11 @@ public class EarthSqure {
 	private int streamState;
 	private int useTimes;
 	private double degreePerSqure_lon;
+
+	// 地球周长
+	private int l_earth = 40075000;
+	// 区块大小，单位：米
+	private int squre_size = 50000;
 
 	/**
 	 * 传入所有参数的构造器
@@ -48,10 +51,6 @@ public class EarthSqure {
 		this.col = col;
 		int t_row = Math.abs(row);
 		int t_col = Math.abs(col);
-		// 地球周长
-		int l_earth = 40075000;
-		// 区块大小，单位：米
-		int squre_size = 20000;
 		// 北半球的行数
 		int row_num = (int) Math.ceil((l_earth / 4) / (double) squre_size);
 		// 每行间隔多少度
@@ -122,10 +121,6 @@ public class EarthSqure {
 
 			// 该点所在区块行号和列号
 			int row, col;
-			// 地球周长
-			int l_earth = 40075000;
-			// 区块大小，单位：米
-			int squre_size = 20000;
 			// 北半球的行数
 			int row_num = (int) Math.ceil((l_earth / 4) / (double) squre_size);
 			// 地球半径
@@ -248,6 +243,15 @@ public class EarthSqure {
 
 	public double getDegreePerSqure_lon() {
 		return degreePerSqure_lon;
+	}
+
+	@Override
+	public String toString() {
+		return "EarthSqure [squreID=" + squreID + ", south=" + south
+				+ ", north=" + north + ", west=" + west + ", east=" + east
+				+ ", row=" + row + ", col=" + col + ", streamState="
+				+ streamState + ", useTimes=" + useTimes
+				+ ", degreePerSqure_lon=" + degreePerSqure_lon + "]";
 	}
 
 }

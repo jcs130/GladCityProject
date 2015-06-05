@@ -1,4 +1,4 @@
-package com.zhongli.dao.impl;
+package com.zhongli.dbupdateservice.dao.impl;
 
 import java.sql.Connection;
 import java.sql.Date;
@@ -13,12 +13,8 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import com.zhongli.dao.TwetDAO;
-import com.zhongli.model.EarthSqure;
-import com.zhongli.model.LocArea;
-import com.zhongli.model.LocPoint;
-import com.zhongli.model.RegInfo;
-import com.zhongli.model.TwetMsg;
+import com.zhongli.dbupdateservice.dao.*;
+import com.zhongli.dbupdateservice.model.*;
 
 public class JdbcTwetDAO implements TwetDAO {
 
@@ -26,6 +22,10 @@ public class JdbcTwetDAO implements TwetDAO {
 
 	public void setDataSource(DataSource dataSource) {
 		this.dataSource = dataSource;
+	}
+
+	public JdbcTwetDAO() {
+		dataSource = new DBHelper();
 	}
 
 	/*
@@ -165,7 +165,7 @@ public class JdbcTwetDAO implements TwetDAO {
 			ps.setInt(1, id);
 			TwetMsg twetMsg = null;
 			ResultSet rs = ps.executeQuery();
-			if (rs.next()) {
+			while (rs.next()) {
 				twetMsg = new TwetMsg(rs.getString("userName"),
 						rs.getString("msg"), rs.getString("week"),
 						rs.getString("month"), rs.getInt("day"),
@@ -198,7 +198,7 @@ public class JdbcTwetDAO implements TwetDAO {
 			PreparedStatement ps = conn.prepareStatement(sqlString);
 			TwetMsg twetMsg = null;
 			ResultSet rs = ps.executeQuery();
-			if (rs.next()) {
+			while (rs.next()) {
 				twetMsg = new TwetMsg(rs.getString("userName"),
 						rs.getString("msg"), rs.getString("week"),
 						rs.getString("month"), rs.getInt("day"),
@@ -409,7 +409,7 @@ public class JdbcTwetDAO implements TwetDAO {
 					PreparedStatement ps = conn.prepareStatement(sqlString);
 					TwetMsg twetMsg = null;
 					ResultSet rs = ps.executeQuery();
-					if (rs.next()) {
+					while (rs.next()) {
 						twetMsg = new TwetMsg(rs.getString("username"),
 								rs.getString("msg"), rs.getString("week"),
 								rs.getString("month"), rs.getInt("day"),
@@ -447,7 +447,7 @@ public class JdbcTwetDAO implements TwetDAO {
 					PreparedStatement ps = conn.prepareStatement(sqlString);
 					TwetMsg twetMsg = null;
 					ResultSet rs = ps.executeQuery();
-					if (rs.next()) {
+					while (rs.next()) {
 						twetMsg = new TwetMsg(rs.getString("username"),
 								rs.getString("msg"), rs.getString("week"),
 								rs.getString("month"), rs.getInt("day"),
@@ -484,7 +484,7 @@ public class JdbcTwetDAO implements TwetDAO {
 				PreparedStatement ps = conn.prepareStatement(sqlString);
 				TwetMsg twetMsg = null;
 				ResultSet rs = ps.executeQuery();
-				if (rs.next()) {
+				while (rs.next()) {
 					twetMsg = new TwetMsg(rs.getString("username"),
 							rs.getString("msg"), rs.getString("week"),
 							rs.getString("month"), rs.getInt("day"),
@@ -595,7 +595,7 @@ public class JdbcTwetDAO implements TwetDAO {
 			PreparedStatement ps = conn.prepareStatement(sqlString);
 			EarthSqure squre = null;
 			ResultSet rs = ps.executeQuery();
-			if (rs.next()) {
+			while (rs.next()) {
 				squre = new EarthSqure(rs.getDouble("south"),
 						rs.getDouble("north"), rs.getDouble("west"),
 						rs.getDouble("east"), rs.getInt("row"),
@@ -632,10 +632,11 @@ public class JdbcTwetDAO implements TwetDAO {
 			PreparedStatement ps = conn.prepareStatement(sqlString);
 			RegInfo reg = null;
 			ResultSet rs = ps.executeQuery();
-			if (rs.next()) {
+			while (rs.next()) {
 				reg = new RegInfo(rs.getString("regname"));
 				reg.setRegID(rs.getInt("regid"));
 				getAreasByReg(reg);
+				System.out.println(reg);
 				result.add(reg);
 			}
 		} catch (SQLException e) {
@@ -649,6 +650,7 @@ public class JdbcTwetDAO implements TwetDAO {
 				}
 			}
 		}
+		System.out.println(result.size());
 		return result;
 	}
 
@@ -669,7 +671,7 @@ public class JdbcTwetDAO implements TwetDAO {
 				conn = dataSource.getConnection();
 				PreparedStatement ps = conn.prepareStatement(sqlString);
 				ResultSet rs = ps.executeQuery();
-				if (rs.next()) {
+				while (rs.next()) {
 					areaIDs.add(rs.getInt("areaid"));
 				}
 				// 根据编号添加具体的对象
@@ -678,7 +680,7 @@ public class JdbcTwetDAO implements TwetDAO {
 							+ areaIDs.get(i) + ";";
 					ps = conn.prepareStatement(sqlString);
 					rs = ps.executeQuery();
-					if (rs.next()) {
+					while (rs.next()) {
 						LocArea loc = new LocArea(areaIDs.get(i),
 								rs.getDouble("north"), rs.getDouble("west"),
 								rs.getDouble("south"), rs.getDouble("east"));
@@ -707,27 +709,91 @@ public class JdbcTwetDAO implements TwetDAO {
 
 	@Override
 	public void saveEarthSqure(double south, double north, double west,
-			double east, int row, int col) {
+			double east, int row, int col, double degreepersqure) {
+		// 先判断数据库中存不存在相同的区块，如果不存在新建一个数据
+		if (!haveSqure(row, col)) {
+
+			Connection conn = null;
+			String sqlString = "INSERT INTO earthsqure (south, north, west, east, row, col,degreepersqure) VALUES ("
+					+ south
+					+ ", "
+					+ north
+					+ ", "
+					+ west
+					+ ", "
+					+ east
+					+ ", "
+					+ row + ", " + col + ", " + degreepersqure + ");";
+			try {
+				conn = dataSource.getConnection();
+				PreparedStatement ps = conn.prepareStatement(sqlString);
+				ps.executeUpdate();
+				ps.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			} finally {
+				if (conn != null) {
+					try {
+						conn.close();
+					} catch (SQLException e) {
+					}
+				}
+			}
+
+		} else {
+			// 如果存在了这个区块则什么也不做
+		}
+	}
+
+	/**
+	 * 查询数据库中是否有指定的区块
+	 * 
+	 * @param row
+	 * @param col
+	 * @return
+	 */
+	private boolean haveSqure(int row, int col) {
+		EarthSqure es = getSqureInfo(row, col);
+		if (es == null) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+
+	@Override
+	public void saveEarthSqure(EarthSqure es) {
+		saveEarthSqure(es.getSouth(), es.getNorth(), es.getWest(),
+				es.getEast(), es.getRow(), es.getCol(),
+				es.getDegreePerSqure_lon());
+
+	}
+
+	@Override
+	public EarthSqure getSqureInfo(int row, int col) {
+		// 根据type获取大区域的信息
+		String sqlString = "SELECT * FROM earthsqure where row =" + row
+				+ "&& col =" + col + ";";
+		// 查询数据库，获取结果
 		Connection conn = null;
-		String sqlString = "INSERT INTO earthsqure (south, north, west, east, row, col) VALUES ("
-				+ south
-				+ ", "
-				+ north
-				+ ", "
-				+ west
-				+ ", "
-				+ east
-				+ ", "
-				+ row
-				+ ", " + col + ");";
+		EarthSqure squre = null;
 		try {
 			conn = dataSource.getConnection();
 			PreparedStatement ps = conn.prepareStatement(sqlString);
-			ps.executeUpdate();
-			ps.close();
+			ResultSet rs = ps.executeQuery();
+			while (rs.next()) {
+				squre = new EarthSqure(rs.getDouble("south"),
+						rs.getDouble("north"), rs.getDouble("west"),
+						rs.getDouble("east"), rs.getInt("row"),
+						rs.getInt("col"), rs.getDouble("degreepersqure"));
+				squre.setSqureID(rs.getInt("squreid"));
+				squre.setStreamState(rs.getInt("streamstate"));
+				squre.setUseTimes(rs.getInt("usetimes"));
+			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
+			// throw new RuntimeException(e);
 			e.printStackTrace();
+
 		} finally {
 			if (conn != null) {
 				try {
@@ -736,6 +802,7 @@ public class JdbcTwetDAO implements TwetDAO {
 				}
 			}
 		}
+		return squre;
 	}
 
 	@Override
@@ -751,7 +818,7 @@ public class JdbcTwetDAO implements TwetDAO {
 			conn = dataSource.getConnection();
 			PreparedStatement ps = conn.prepareStatement(sqlString);
 			ResultSet rs = ps.executeQuery();
-			if (rs.next()) {
+			while (rs.next()) {
 				LocArea loc = new LocArea(rs.getInt("areaid"),
 						rs.getDouble("north"), rs.getDouble("west"),
 						rs.getDouble("south"), rs.getDouble("east"));
@@ -775,7 +842,7 @@ public class JdbcTwetDAO implements TwetDAO {
 	@Override
 	public List<EarthSqure> getSquresByLoc(double north, double south,
 			double west, double east) {
-		// TODO Auto-generated method stub
+		// 获取四个顶点的所在的区块，并把之间的区块都添加
 		return null;
 	}
 
@@ -783,22 +850,53 @@ public class JdbcTwetDAO implements TwetDAO {
 	public List<EarthSqure> getStreamSqures(RegInfo reg) {
 		ArrayList<LocArea> areas = reg.getAreas();
 		ArrayList<EarthSqure> result = new ArrayList<EarthSqure>();
+		System.out.println();
+		System.out.println(reg.getRegName());
 		// 循环得到Stream区块
 		for (int i = 0; i < areas.size(); i++) {
-			EarthSqure e;
+			System.out.println("area:" + (i + 1));
 			// 每个区块四个顶点分别计算
 			// NW
-			e = new EarthSqure(areas.get(i).getNorth(), areas.get(i).getWest());
-			addToArray(result, e);
+			EarthSqure e1 = new EarthSqure(areas.get(i).getNorth(), areas
+					.get(i).getWest());
+			addToArray(result, e1);
 			// NE
-			e = new EarthSqure(areas.get(i).getNorth(), areas.get(i).getEast());
-			addToArray(result, e);
+			EarthSqure e2 = new EarthSqure(areas.get(i).getNorth(), areas
+					.get(i).getEast());
+			addToArray(result, e2);
 			// SW
-			e = new EarthSqure(areas.get(i).getSouth(), areas.get(i).getWest());
-			addToArray(result, e);
+			EarthSqure e3 = new EarthSqure(areas.get(i).getSouth(), areas
+					.get(i).getWest());
+			addToArray(result, e3);
 			// SE
-			e = new EarthSqure(areas.get(i).getSouth(), areas.get(i).getEast());
-			addToArray(result, e);
+			EarthSqure e4 = new EarthSqure(areas.get(i).getSouth(), areas
+					.get(i).getEast());
+			addToArray(result, e4);
+			System.out.println("fill:");
+			// 如果四个顶点所在的区域之间存在空隙则增加空隙区域的区块
+			// 首先补全上下两边界的区域
+			for (int j = e1.getCol(); j < e2.getCol(); j++) {
+				EarthSqure e = new EarthSqure(e1.getRow(), j);
+				addToArray(result, e);
+			}
+			for (int j = e3.getCol(); j < e4.getCol(); j++) {
+				EarthSqure e = new EarthSqure(e3.getRow(), j);
+				addToArray(result, e);
+			}
+
+			// 开始补全中间的行
+			for (double j = e3.getNorth(); j < e1.getSouth(); j += 0.15) {
+				// 这一行从西到东补全
+				EarthSqure ew = new EarthSqure(j, areas.get(i).getWest());
+				EarthSqure ee = new EarthSqure(j, areas.get(i).getEast());
+				addToArray(result, ew);
+				addToArray(result, ee);
+				for (int k = ew.getCol(); k < ee.getCol(); k++) {
+					EarthSqure e = new EarthSqure(ew.getRow(), k);
+					addToArray(result, e);
+				}
+			}
+
 		}
 		return result;
 	}
@@ -810,6 +908,7 @@ public class JdbcTwetDAO implements TwetDAO {
 				return false;
 			}
 		}
+		System.out.println(e);
 		list.add(e);
 		return true;
 

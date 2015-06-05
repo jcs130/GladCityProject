@@ -1,13 +1,10 @@
-package com.zhongli.dao;
+package com.zhongli.dbupdateservice.dao;
 
 import java.sql.Date;
 import java.sql.Time;
 import java.util.List;
 
-import com.zhongli.model.EarthSqure;
-import com.zhongli.model.LocArea;
-import com.zhongli.model.RegInfo;
-import com.zhongli.model.TwetMsg;
+import com.zhongli.dbupdateservice.model.*;
 
 /**
  * 数据库操作接口类
@@ -114,9 +111,26 @@ public interface TwetDAO {
 	 * @param east
 	 * @param row
 	 * @param col
+	 * @param degreepersqure
 	 */
 	public void saveEarthSqure(double south, double north, double west,
-			double east, int row, int col);
+			double east, int row, int col, double degreepersqure);
+
+	/**
+	 * 向数据库中存储Stream区块
+	 * 
+	 * @param es
+	 */
+	public void saveEarthSqure(EarthSqure es);
+
+	/**
+	 * 根据行列查询区块
+	 * 
+	 * @param row
+	 * @param col
+	 * @return
+	 */
+	public EarthSqure getSqureInfo(int row, int col);
 
 	/**
 	 * 从数据库中获取监听区域的信息
