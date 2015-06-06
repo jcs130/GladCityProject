@@ -20,16 +20,14 @@ import com.zhongli.dbupdateservice.servicethreads.ServiceThread;
 public class TwitterStreamThread extends ServiceThread {
 	private ArrayList<EarthSqure> watchList;
 	private JdbcTwetDAO db;
+	private TwitterTools tt;
 	private TwitterStream twitterStream;
-	LocatedTwitterListener listener;
+	private LocatedTwitterListener listener;
 
 	public TwitterStreamThread(ArrayList<EarthSqure> watchList, TwitterTools tt) {
 		this.watchList = watchList;
-		this.db = new JdbcTwetDAO();
-		ConfigurationBuilder cb = tt.getConfigurationBuilder();
-		this.twitterStream = new TwitterStreamFactory(cb.build()).getInstance();
-		this.listener = new LocatedTwitterListener(watchList, db);
-		this.twitterStream.addListener(listener);
+		this.tt = tt;
+		init();
 	}
 
 	// @Override
@@ -100,15 +98,8 @@ public class TwitterStreamThread extends ServiceThread {
 	}
 
 	private void init() {
-		ConfigurationBuilder cb = new ConfigurationBuilder();
-		cb.setDebugEnabled(true)
-				.setOAuthConsumerKey("4moUpaUZE1wwmV1ASjm4DCo5s")
-				.setOAuthConsumerSecret(
-						"CZhI6yAUkCVpLq8zZ4tzV6tuSwG3c8BH1wfVIXJMHUynoQgbp7")
-				.setOAuthAccessToken(
-						"1663910887-tR8kQSAsXhCJVeQdAseENtntkDVKAbEO9ecX7ee")
-				.setOAuthAccessTokenSecret(
-						"6NaZeNI28L9kGYTXhbDGeXod26tnBcGA6jPRCAPvXABnf");
+		this.db = new JdbcTwetDAO();
+		ConfigurationBuilder cb = tt.getConfigurationBuilder();
 		this.twitterStream = new TwitterStreamFactory(cb.build()).getInstance();
 		this.listener = new LocatedTwitterListener(watchList, db);
 		this.twitterStream.addListener(listener);

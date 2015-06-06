@@ -68,8 +68,10 @@ body {
 
 	function placeMarker(location, content, emotion) {
 		//如果表计数量大于一定值，则删除最后一个
-		if (markersArray.length > 15) {
+		if (markersArray.length > 20) {
 			markersArray.shift().setMap(null);
+		}
+		if(infowindowArray.length>2){
 			infowindowArray.shift().close();
 		}
 		var ticon;
@@ -93,6 +95,7 @@ body {
 		var infowindow = new google.maps.InfoWindow({
 			content : content
 		});
+		
 		infowindowArray.push(infowindow);
 
 		infowindow.open(map, marker);

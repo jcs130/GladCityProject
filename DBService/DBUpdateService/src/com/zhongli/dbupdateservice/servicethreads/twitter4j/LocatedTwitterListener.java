@@ -1,6 +1,5 @@
 package com.zhongli.dbupdateservice.servicethreads.twitter4j;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 import com.zhongli.dbupdateservice.dao.impl.JdbcTwetDAO;
@@ -69,14 +68,14 @@ public class LocatedTwitterListener implements StatusListener {
 				// + " - " + status.getText() + "["
 				// + status.getGeoLocation().getLatitude() + ","
 				// + status.getGeoLocation().getLongitude() + "]");
-				String res = "";
-				res += "@" + status.getUser().getScreenName() + "\t"
-						+ status.getText().replace("\n", " ") + "\t"
-						+ status.getCreatedAt() + "\t"
-						+ status.getGeoLocation().getLatitude() + ","
-						+ status.getGeoLocation().getLongitude() + "\t"
-						+ status.getLang() + "\n";
-				System.out.print(res);
+				// String res = "";
+				// res += "@" + status.getUser().getScreenName() + "\t"
+				// + status.getText().replace("\n", " ") + "\t"
+				// + status.getCreatedAt() + "\t"
+				// + status.getGeoLocation().getLatitude() + ","
+				// + status.getGeoLocation().getLongitude() + "\t"
+				// + status.getLang() + "\n";
+				// System.out.print(res);
 				// 存入数据库
 				TwetMsg tMsg = new TwetMsg(status.getUser().getScreenName(),
 						status.getText(), status.getCreatedAt().toString(),

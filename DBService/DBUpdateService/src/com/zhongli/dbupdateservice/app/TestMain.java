@@ -17,9 +17,9 @@ public class TestMain {
 		// System.out.println(tm.getClass().getSimpleName());
 		// tm.doSth();
 		// 恢复数据库为初始状态
-		tm.reSetDB();
+		// tm.reSetDB();
 		// 开始管理各个线程
-		tm.startThreads(10000, 10000, 1000);
+		tm.startThreads(5000, 5000, 5000);
 		// 主线程循环
 		while (true) {
 			try {
@@ -35,6 +35,13 @@ public class TestMain {
 	private void reSetDB() {
 		this.db = new JdbcTwetDAO();
 		db.reSetStates();
+		System.out.println("等待数据库操作2秒");
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	/**

@@ -59,7 +59,7 @@ public class DaoSetting {
 	 * @return
 	 */
 	public String DBChooese(double lat, double lan) {
-		System.out.println(dbAreas.size());
+		//System.out.println(dbAreas.size());
 		for (int i = 0; i < dbAreas.size(); i++) {
 			if (lat <= dbAreas.get(i).getNorth()
 					&& lat > dbAreas.get(i).getSouth()

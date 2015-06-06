@@ -36,7 +36,7 @@ public class StreamsManagerThread extends ServiceThread {
 				ess = (ArrayList<EarthSqure>) db.getReadySqure();
 				// 新建监视线程，每个监视线程监视5个区块
 				buildStreamthreads(20, ess);
-				sleep(time);
+				sleep(100);
 			} catch (InterruptedException e) {
 				isRunning = false;
 				System.out.println("线程:" + this.gettName() + "结束....");
