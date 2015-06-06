@@ -13,6 +13,13 @@ import com.zhongli.dbupdateservice.model.*;
  *
  */
 public interface TwetDAO {
+	
+	/**
+	 * 重置数据库的状态
+	 */
+	public void reSetStates();
+	
+	
 	/**
 	 * 向数据库中插入推特数据
 	 * 
@@ -79,16 +86,25 @@ public interface TwetDAO {
 	public List<RegInfo> getRegInfo(int type);
 
 	/**
-	 * 获取指定区域所包含的Stream区块以及区块的状态
+	 * 改变大区域状态
 	 * 
-	 * @param north
-	 * @param south
-	 * @param west
-	 * @param east
-	 * @return
+	 * @param id
+	 * @param type
+	 * @param usetimes
 	 */
-	public List<EarthSqure> getSquresByLoc(double north, double south,
-			double west, double east);
+	public void changeRegState(int id, int type);
+
+	// /**
+	// * 获取指定区域所包含的Stream区块以及区块的状态
+	// *
+	// * @param north
+	// * @param south
+	// * @param west
+	// * @param east
+	// * @return
+	// */
+	// public List<EarthSqure> getSquresByLoc(double north, double south,
+	// double west, double east);
 
 	/**
 	 * 获取指定区域内的所有用户自定义区块
@@ -140,6 +156,39 @@ public interface TwetDAO {
 	 * @return
 	 */
 	public List<EarthSqure> getSqureInfo(int type);
+
+	/**
+	 * 从数据库中获取使用次数>0但是没有被监视的Stream区块
+	 * 
+	 * @return
+	 */
+	public List<EarthSqure> getReadySqure();
+
+	/**
+	 * 从数据库中获取使用次数为0但是没有停止监视的块
+	 * 
+	 * @return
+	 */
+	public List<EarthSqure> getShouldStopSqure();
+
+	/**
+	 * 改变指定区块的状态变量
+	 * 
+	 * @param id
+	 * @param type
+	 * @param threadname
+	 */
+	public void changeSqureState(int id, int type, String threadname);
+
+	/**
+	 * 增加区块的使用次数 +1
+	 */
+	public void squreAddUseTime(int row, int col);
+
+	/**
+	 * 减少区块的使用次数 -1
+	 */
+	public void squreDelUseTime(int row, int col);
 
 	/**
 	 * 传入大区域对象，遍历小区域，然后将小区与四个点所在的Stream区块标记出来，

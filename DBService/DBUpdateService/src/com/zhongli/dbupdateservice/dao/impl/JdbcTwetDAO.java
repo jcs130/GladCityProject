@@ -19,6 +19,7 @@ import com.zhongli.dbupdateservice.model.*;
 public class JdbcTwetDAO implements TwetDAO {
 
 	private DataSource dataSource;
+	private DaoSetting ds;
 
 	public void setDataSource(DataSource dataSource) {
 		this.dataSource = dataSource;
@@ -26,6 +27,7 @@ public class JdbcTwetDAO implements TwetDAO {
 
 	public JdbcTwetDAO() {
 		dataSource = new DBHelper();
+		ds = new DaoSetting();
 	}
 
 	/*
@@ -49,10 +51,12 @@ public class JdbcTwetDAO implements TwetDAO {
 	@Override
 	public void insert(TwetMsg tweet) {
 		String sqlString = "INSERT INTO ";
+		String sqlString2 = "";
 		// 根据地理位置信息写入数据道不同的数据库
-		sqlString += DaoSetting.DBChooese(tweet.getLocation()[0],
+		sqlString += ds.DBChooese(tweet.getLocation()[0],
 				tweet.getLocation()[1]);
 		sqlString += "(username, msg, date, time, location_lat, location_lan, language) VALUES (?, ?, ?, ?, ?, ?, ?)";
+		sqlString2 += "INSERT INTO alltwets (username, msg, week, month, day, time, timezone, year, location_lat, location_lan, language) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 		Connection conn = null;
 		try {
 			conn = dataSource.getConnection();
@@ -65,6 +69,21 @@ public class JdbcTwetDAO implements TwetDAO {
 			ps.setDouble(5, tweet.getLocation()[0]);
 			ps.setDouble(6, tweet.getLocation()[1]);
 			ps.setString(7, tweet.getLanguage());
+			ps.executeUpdate();
+			ps.close();
+
+			ps = conn.prepareStatement(sqlString2);
+			ps.setString(1, tweet.getUserName());
+			ps.setString(2, tweet.getMsg());
+			ps.setString(3, tweet.getWeek());
+			ps.setString(4, tweet.getMonth());
+			ps.setInt(5, tweet.getDay());
+			ps.setString(6, tweet.getTime());
+			ps.setString(7, tweet.getTimeZone());
+			ps.setInt(8, tweet.getYear());
+			ps.setDouble(9, tweet.getLocation()[0]);
+			ps.setDouble(10, tweet.getLocation()[1]);
+			ps.setString(11, tweet.getLanguage());
 			ps.executeUpdate();
 			ps.close();
 
@@ -225,7 +244,7 @@ public class JdbcTwetDAO implements TwetDAO {
 	@Override
 	public void updateEmotion(int id, String motionType, double confidence) {
 		String sqlString = "UPDATE alltwets SET emotion=?, confidence=? WHERE numID=?";
-		System.out.println("id:" + id + "motion:" + motionType);
+		// System.out.println("id:" + id + "motion:" + motionType);
 		Connection conn = null;
 		try {
 			conn = dataSource.getConnection();
@@ -391,10 +410,10 @@ public class JdbcTwetDAO implements TwetDAO {
 		if (north != 0 && south != 0 && west != 0 && east != 0) {
 			// 1.首先根据经纬度选择表,判断要从哪些数据库表中获取数据，一般只有1个，最多4个
 			HashSet<String> dataBases = new HashSet<String>();
-			dataBases.add(DaoSetting.DBChooese(north, west));
-			dataBases.add(DaoSetting.DBChooese(north, east));
-			dataBases.add(DaoSetting.DBChooese(south, west));
-			dataBases.add(DaoSetting.DBChooese(south, east));
+			dataBases.add(ds.DBChooese(north, west));
+			dataBases.add(ds.DBChooese(north, east));
+			dataBases.add(ds.DBChooese(south, west));
+			dataBases.add(ds.DBChooese(south, east));
 			System.out.println("the number of databases is : "
 					+ dataBases.size());
 			Iterator<String> iterator = dataBases.iterator();
@@ -436,8 +455,8 @@ public class JdbcTwetDAO implements TwetDAO {
 
 			}
 		} else {
-			for (int i = 0; i < DaoSetting.getDbAreas().size(); i++) {
-				String sqlString = makeSqlString(DaoSetting.getDbAreas().get(i)
+			for (int i = 0; i < ds.getDbAreas().size(); i++) {
+				String sqlString = makeSqlString(ds.getDbAreas().get(i)
 						.getLocName(), north, west, south, east, date_start,
 						date_end, time_start, time_end, language, emotion);
 				// 查询数据库，获取结果
@@ -577,14 +596,14 @@ public class JdbcTwetDAO implements TwetDAO {
 			sqlString += "&&emotion=='" + emotion + "'";
 		}
 		sqlString += ";";
-		System.out.println(sqlString);
+		// System.out.println(sqlString);
 
 		return sqlString;
 	}
 
 	@Override
 	public List<EarthSqure> getSqureInfo(int type) {
-		// 根据type获取大区域的信息
+		// 数据库查询语句
 		String sqlString = "SELECT * FROM earthsqure where streamstate ="
 				+ type + ";";
 		ArrayList<EarthSqure> result = new ArrayList<EarthSqure>();
@@ -603,6 +622,7 @@ public class JdbcTwetDAO implements TwetDAO {
 				squre.setSqureID(rs.getInt("squreid"));
 				squre.setStreamState(rs.getInt("streamstate"));
 				squre.setUseTimes(rs.getInt("usetimes"));
+				squre.setThreadName(rs.getString("threadname"));
 				result.add(squre);
 			}
 		} catch (SQLException e) {
@@ -623,7 +643,7 @@ public class JdbcTwetDAO implements TwetDAO {
 	public List<RegInfo> getRegInfo(int type) {
 		// 根据type获取大区域的信息
 		String sqlString = "SELECT * FROM regnames where streamstate =" + type
-				+ "&&private=0;";
+				+ ";";
 		ArrayList<RegInfo> result = new ArrayList<RegInfo>();
 		// 查询数据库，获取结果
 		Connection conn = null;
@@ -636,7 +656,7 @@ public class JdbcTwetDAO implements TwetDAO {
 				reg = new RegInfo(rs.getString("regname"));
 				reg.setRegID(rs.getInt("regid"));
 				getAreasByReg(reg);
-				System.out.println(reg);
+				// System.out.println(reg);
 				result.add(reg);
 			}
 		} catch (SQLException e) {
@@ -650,7 +670,7 @@ public class JdbcTwetDAO implements TwetDAO {
 				}
 			}
 		}
-		System.out.println(result.size());
+		// System.out.println(result.size());
 		return result;
 	}
 
@@ -789,6 +809,7 @@ public class JdbcTwetDAO implements TwetDAO {
 				squre.setSqureID(rs.getInt("squreid"));
 				squre.setStreamState(rs.getInt("streamstate"));
 				squre.setUseTimes(rs.getInt("usetimes"));
+				squre.setThreadName(rs.getString("threadname"));
 			}
 		} catch (SQLException e) {
 			// throw new RuntimeException(e);
@@ -808,6 +829,7 @@ public class JdbcTwetDAO implements TwetDAO {
 	@Override
 	public List<LocArea> getAreaByLoc(double north, double south, double west,
 			double east) {
+		// 数据库查询语句
 		String sqlString = "SELECT * FROM interestareas where center_lat<="
 				+ north + "&&center_lat>=" + south + "&&center_lon>=" + west
 				+ "&&center_lon<=" + east + ";";
@@ -839,22 +861,22 @@ public class JdbcTwetDAO implements TwetDAO {
 		return result;
 	}
 
-	@Override
-	public List<EarthSqure> getSquresByLoc(double north, double south,
-			double west, double east) {
-		// 获取四个顶点的所在的区块，并把之间的区块都添加
-		return null;
-	}
+	// @Override
+	// public List<EarthSqure> getSquresByLoc(double north, double south,
+	// double west, double east) {
+	// // 获取四个顶点的所在的区块，并把之间的区块都添加
+	// return null;
+	// }
 
 	@Override
 	public List<EarthSqure> getStreamSqures(RegInfo reg) {
 		ArrayList<LocArea> areas = reg.getAreas();
 		ArrayList<EarthSqure> result = new ArrayList<EarthSqure>();
-		System.out.println();
-		System.out.println(reg.getRegName());
+		// System.out.println();
+		// System.out.println(reg.getRegName());
 		// 循环得到Stream区块
 		for (int i = 0; i < areas.size(); i++) {
-			System.out.println("area:" + (i + 1));
+			// System.out.println("area:" + (i + 1));
 			// 每个区块四个顶点分别计算
 			// NW
 			EarthSqure e1 = new EarthSqure(areas.get(i).getNorth(), areas
@@ -872,7 +894,7 @@ public class JdbcTwetDAO implements TwetDAO {
 			EarthSqure e4 = new EarthSqure(areas.get(i).getSouth(), areas
 					.get(i).getEast());
 			addToArray(result, e4);
-			System.out.println("fill:");
+			// System.out.println("fill:");
 			// 如果四个顶点所在的区域之间存在空隙则增加空隙区域的区块
 			// 首先补全上下两边界的区域
 			for (int j = e1.getCol(); j < e2.getCol(); j++) {
@@ -908,10 +930,211 @@ public class JdbcTwetDAO implements TwetDAO {
 				return false;
 			}
 		}
-		System.out.println(e);
+		// System.out.println(e);
 		list.add(e);
 		return true;
 
 	}
 
+	@Override
+	public void changeRegState(int id, int type) {
+		String sqlString = "UPDATE regnames SET streamstate=? WHERE regID=?";
+		Connection conn = null;
+		try {
+			conn = dataSource.getConnection();
+			PreparedStatement ps = conn.prepareStatement(sqlString);
+			ps.setInt(1, type);
+			ps.setInt(2, id);
+			ps.executeUpdate();
+
+			ps.close();
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+
+		} finally {
+			if (conn != null) {
+				try {
+					conn.close();
+				} catch (SQLException e) {
+				}
+			}
+		}
+	}
+
+	@Override
+	public void changeSqureState(int id, int type, String threadname) {
+		String sqlString = "UPDATE earthsqure SET streamstate=?, threadname=? WHERE squreid=?";
+		Connection conn = null;
+		try {
+			conn = dataSource.getConnection();
+			PreparedStatement ps = conn.prepareStatement(sqlString);
+			ps.setInt(1, type);
+			ps.setString(2, threadname);
+			ps.setInt(3, id);
+			ps.executeUpdate();
+
+			ps.close();
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+
+		} finally {
+			if (conn != null) {
+				try {
+					conn.close();
+				} catch (SQLException e) {
+				}
+			}
+		}
+	}
+
+	@Override
+	public void squreAddUseTime(int row, int col) {
+		String sqlString = "UPDATE earthsqure SET usetimes=usetimes+1 WHERE row=? && col=?";
+		Connection conn = null;
+		try {
+			conn = dataSource.getConnection();
+			PreparedStatement ps = conn.prepareStatement(sqlString);
+			ps.setInt(1, row);
+			ps.setInt(2, col);
+			ps.executeUpdate();
+
+			ps.close();
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+
+		} finally {
+			if (conn != null) {
+				try {
+					conn.close();
+				} catch (SQLException e) {
+				}
+			}
+		}
+	}
+
+	@Override
+	public void squreDelUseTime(int row, int col) {
+		String sqlString = "UPDATE earthsqure SET usetimes=usetimes-1 WHERE row=? && col=?";
+		Connection conn = null;
+		try {
+			conn = dataSource.getConnection();
+			PreparedStatement ps = conn.prepareStatement(sqlString);
+			ps.setInt(1, row);
+			ps.setInt(2, col);
+			ps.executeUpdate();
+
+			ps.close();
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+
+		} finally {
+			if (conn != null) {
+				try {
+					conn.close();
+				} catch (SQLException e) {
+				}
+			}
+		}
+	}
+
+	@Override
+	public List<EarthSqure> getReadySqure() {
+		// 数据库查询语句
+		String sqlString = "SELECT * FROM earthsqure where streamstate =0&&usetimes>0;";
+		ArrayList<EarthSqure> result = new ArrayList<EarthSqure>();
+		// 查询数据库，获取结果
+		Connection conn = null;
+		try {
+			conn = dataSource.getConnection();
+			PreparedStatement ps = conn.prepareStatement(sqlString);
+			EarthSqure squre = null;
+			ResultSet rs = ps.executeQuery();
+			while (rs.next()) {
+				squre = new EarthSqure(rs.getDouble("south"),
+						rs.getDouble("north"), rs.getDouble("west"),
+						rs.getDouble("east"), rs.getInt("row"),
+						rs.getInt("col"), rs.getDouble("degreepersqure"));
+				squre.setSqureID(rs.getInt("squreid"));
+				squre.setStreamState(rs.getInt("streamstate"));
+				squre.setUseTimes(rs.getInt("usetimes"));
+				squre.setThreadName(rs.getString("threadname"));
+				result.add(squre);
+			}
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+
+		} finally {
+			if (conn != null) {
+				try {
+					conn.close();
+				} catch (SQLException e) {
+				}
+			}
+		}
+		return result;
+	}
+
+	@Override
+	public List<EarthSqure> getShouldStopSqure() {
+		// 数据库查询语句
+		String sqlString = "SELECT * FROM earthsqure where streamstate =1&&usetimes<=0;";
+		ArrayList<EarthSqure> result = new ArrayList<EarthSqure>();
+		// 查询数据库，获取结果
+		Connection conn = null;
+		try {
+			conn = dataSource.getConnection();
+			PreparedStatement ps = conn.prepareStatement(sqlString);
+			EarthSqure squre = null;
+			ResultSet rs = ps.executeQuery();
+			while (rs.next()) {
+				squre = new EarthSqure(rs.getDouble("south"),
+						rs.getDouble("north"), rs.getDouble("west"),
+						rs.getDouble("east"), rs.getInt("row"),
+						rs.getInt("col"), rs.getDouble("degreepersqure"));
+				squre.setSqureID(rs.getInt("squreid"));
+				squre.setStreamState(rs.getInt("streamstate"));
+				squre.setUseTimes(rs.getInt("usetimes"));
+				squre.setThreadName(rs.getString("threadname"));
+				result.add(squre);
+			}
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+
+		} finally {
+			if (conn != null) {
+				try {
+					conn.close();
+				} catch (SQLException e) {
+				}
+			}
+		}
+		return result;
+	}
+
+	@Override
+	public void reSetStates() {
+		String sqlString = "UPDATE earthsqure SET streamstate=0, usetimes=0, threadname=? WHERE squreID>0;";
+		String sqlString2 = "UPDATE regnames SET streamstate=0 WHERE regid>0;";
+		Connection conn = null;
+		try {
+			conn = dataSource.getConnection();
+			PreparedStatement ps = conn.prepareStatement(sqlString);
+			ps.setString(1, "none");
+			ps.executeUpdate();
+			ps.close();
+			ps = conn.prepareStatement(sqlString2);
+			ps.executeUpdate();
+			ps.close();
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+
+		} finally {
+			if (conn != null) {
+				try {
+					conn.close();
+				} catch (SQLException e) {
+				}
+			}
+		}
+	}
 }

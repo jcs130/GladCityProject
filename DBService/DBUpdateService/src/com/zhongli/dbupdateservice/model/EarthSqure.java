@@ -13,11 +13,12 @@ public class EarthSqure {
 	private int streamState;
 	private int useTimes;
 	private double degreePerSqure_lon;
+	private String threadName;
 
 	// 地球周长
 	private int l_earth = 40075000;
 	// 区块大小，单位：米
-	private int squre_size = 50000;
+	private int squre_size = 40000;
 
 	/**
 	 * 传入所有参数的构造器
@@ -193,6 +194,15 @@ public class EarthSqure {
 
 	}
 
+	// 检测一个点是否在这个区域内
+	public boolean containThis(double lat, double lon) {
+		if (lat >= this.south && lat <= this.north && lon >= this.west
+				&& lon <= this.east) {
+			return true;
+		}
+		return false;
+	}
+
 	public int getSqureID() {
 		return squreID;
 	}
@@ -252,6 +262,14 @@ public class EarthSqure {
 				+ ", row=" + row + ", col=" + col + ", streamState="
 				+ streamState + ", useTimes=" + useTimes
 				+ ", degreePerSqure_lon=" + degreePerSqure_lon + "]";
+	}
+
+	public String getThreadName() {
+		return threadName;
+	}
+
+	public void setThreadName(String threadName) {
+		this.threadName = threadName;
 	}
 
 }
