@@ -6,6 +6,7 @@ import com.zhongli.dbupdateservice.dao.impl.JdbcTwetDAO;
 import com.zhongli.dbupdateservice.model.EarthSqure;
 import com.zhongli.dbupdateservice.model.TwetMsg;
 
+import twitter4j.GeoLocation;
 import twitter4j.StallWarning;
 import twitter4j.Status;
 import twitter4j.StatusDeletionNotice;
@@ -21,6 +22,7 @@ public class LocatedTwitterListener implements StatusListener {
 
 	private ArrayList<EarthSqure> watchLocs;
 	private JdbcTwetDAO db;
+	private TwetMsg tMsg;
 
 	public LocatedTwitterListener(ArrayList<EarthSqure> watchLocs,
 			JdbcTwetDAO db) {
@@ -76,20 +78,53 @@ public class LocatedTwitterListener implements StatusListener {
 				// + status.getGeoLocation().getLongitude() + "\t"
 				// + status.getLang() + "\n";
 				// System.out.print(res);
-				// 存入数据库
-				TwetMsg tMsg = new TwetMsg(status.getUser().getScreenName(),
+
+				tMsg = new TwetMsg(status.getUser().getScreenName(),
 						status.getText(), status.getCreatedAt().toString(),
 						status.getGeoLocation().getLatitude(), status
 								.getGeoLocation().getLongitude(),
 						status.getLang());
-				try {
-					db.insert(tMsg);
-					System.out.println(tMsg);
-				} catch (Exception e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
+
 			}
+		} else {
+			double center_lat = 0, center_lon = 0;
+			// 根据城市边界确定城市中心
+			// String placeType = status.getPlace().getPlaceType();
+			// if (placeType.equals("city")) {
+			if (status.getPlace() != null) {
+				GeoLocation[][] box = status.getPlace()
+						.getBoundingBoxCoordinates();
+				double sum_lat = 0;
+				double sum_lon = 0;
+				for (int i = 0; i < box.length; i++) {
+					// double sum_lat=0;
+					// double sum_lon=0;
+					for (int j = 0; j < box[0].length; j++) {
+						double lat = box[i][j].getLatitude();
+						double lon = box[i][j].getLongitude();
+						sum_lat += lat;
+						sum_lon += lon;
+					}
+				}
+				center_lat = sum_lat / (double) (box.length * box[0].length);
+				center_lon = sum_lon / (double) (box.length * box[0].length);
+				tMsg = new TwetMsg(status.getUser().getScreenName(),
+						status.getText(), status.getCreatedAt().toString(),
+						center_lat, center_lon, status.getLang());
+				System.out.println("city:" + status.getPlace().getName()
+						+ ",center:[" + center_lat + "," + center_lon + "]");
+			} else {
+				System.out.println("特殊情况：\n" + status);
+			}
+
+		}
+		// 存入数据库
+		try {
+			db.insert(tMsg);
+			System.out.println(tMsg);
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
 		}
 
 	}

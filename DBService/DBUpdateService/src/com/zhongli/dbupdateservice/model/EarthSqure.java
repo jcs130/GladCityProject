@@ -18,7 +18,7 @@ public class EarthSqure {
 	// 地球周长
 	private int l_earth = 40075000;
 	// 区块大小，单位：米
-	private int squre_size = 40000;
+	private int squre_size = 20000;
 
 	/**
 	 * 传入所有参数的构造器

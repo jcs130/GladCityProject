@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import com.zhongli.dbupdateservice.model.LocArea;
 
 /**
- * 静态类，用于存储数据库一些参数
+ * 用于存储数据库一些参数
  * 
  * @author John
  *
