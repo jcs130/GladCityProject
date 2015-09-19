@@ -1,0 +1,260 @@
+
+
+
+	public User(String email, String password, List<Role> roles) {
+		if (((email == null) || "".equals(email)) || (password == null)) {
+			throw new IllegalArgumentException("Cannot pass null or empty values to constructor");
+		}
+
+		this.email = email;
+		this.password = password;
+		this.roles = roles;
+		this.enabled = false;
+		this.tokenExpired = false;
+//		this.authorities = Collections
+//				.unmodifiableSet(sortAuthorities(getGrantedAuthorities_Roles_and_Privileges(roles)));
+	}
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Long id;
+
+	private String firstName;
+
+	private String lastName;
+
+	private String email;
+
+	@Column(length = 60)
+	private String password;
+
+	private boolean enabled;
+
+	private boolean tokenExpired;
+
+	private Date created_on = new Date();
+
+	@Transient
+	private Set<GrantedAuthority> authorities;
+	@ManyToMany
+	@JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id") , inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id") )
+	private Collection<Role> roles;
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(final Long id) {
+		this.id = id;
+	}
+
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public void setFirstName(final String firstName) {
+		this.firstName = firstName;
+	}
+
+	public String getLastName() {
+		return lastName;
+	}
+
+	public void setLastName(final String lastName) {
+		this.lastName = lastName;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(final String username) {
+		this.email = username;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(final String password) {
+		this.password = password;
+	}
+
+	public Collection<Role> getRoles() {
+		return roles;
+	}
+
+	public void setRoles(final Collection<Role> roles) {
+		this.roles = roles;
+	}
+
+	public boolean isEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(final boolean enabled) {
+		this.enabled = enabled;
+	}
+
+	public boolean isTokenExpired() {
+		return tokenExpired;
+	}
+
+	public void setTokenExpired(final boolean expired) {
+		this.tokenExpired = expired;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((email == null) ? 0 : email.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final User user = (User) obj;
+		if (!email.toLowerCase().equals(user.email.toLowerCase())) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "User [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", email=" + email
+				+ ", password=[PROTECTED]" + ", enabled=" + enabled + ", tokenExpired=" + tokenExpired + ", created_on="
+				+ created_on + ", authorities=" + authorities + ", roles=" + roles + "]";
+	}
+
+	public Date getCreated_on() {
+		return created_on;
+	}
+
+	public void setCreated_on(Date created_on) {
+		this.created_on = created_on;
+	}
+
+	@Override
+	public String getUsername() {
+		System.out.println("获取用户名用于验证："+email+"\n密码为："+password);
+		return email;
+	}
+
+	@Override
+	public boolean isAccountNonExpired() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isAccountNonLocked() {
+		// TODO Auto-generated method stub
+		return !enabled;
+	}
+
+	@Override
+	public boolean isCredentialsNonExpired() {
+		// TODO Auto-generated method stub
+		return true;
+	}
+//
+//	@Override
+//	public void eraseCredentials() {
+//		password = null;
+//	}
+
+	@Override
+	public Collection<GrantedAuthority> getAuthorities() {
+		return authorities;
+	}
+	
+	public void setAuthorities(Set<GrantedAuthority> authorities){
+		this.authorities=authorities;
+	}
+
+	private static class AuthorityComparator implements Comparator<GrantedAuthority>, Serializable {
+		private static final long serialVersionUID = SpringSecurityCoreVersion.SERIAL_VERSION_UID;
+
+		public int compare(GrantedAuthority g1, GrantedAuthority g2) {
+			// Neither should ever be null as each entry is checked before
+			// adding it to the set.
+			// If the authority is null, it is a custom authority and should
+			// precede others.
+			if (g2.getAuthority() == null) {
+				return -1;
+			}
+
+			if (g1.getAuthority() == null) {
+				return 1;
+			}
+
+			return g1.getAuthority().compareTo(g2.getAuthority());
+		}
+	}
+
+	private static SortedSet<GrantedAuthority> sortAuthorities(Collection<? extends GrantedAuthority> authorities) {
+		Assert.notNull(authorities, "Cannot pass a null GrantedAuthority collection");
+		// Ensure array iteration order is predictable (as per
+		// UserDetails.getAuthorities() contract and SEC-717)
+		SortedSet<GrantedAuthority> sortedAuthorities = new TreeSet<GrantedAuthority>(new AuthorityComparator());
+
+		for (GrantedAuthority grantedAuthority : authorities) {
+			Assert.notNull(grantedAuthority, "GrantedAuthority list cannot contain any null elements");
+			sortedAuthorities.add(grantedAuthority);
+		}
+
+		return sortedAuthorities;
+	}
+
+	/**
+	 * 同时获得角色和权限
+	 * 
+	 * @param roles
+	 * @return
+	 */
+	private final List<GrantedAuthority> getGrantedAuthorities_Roles_and_Privileges(final Collection<Role> roles) {
+		final List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
+		for (final Role role : roles) {
+			authorities.add(new SimpleGrantedAuthority(role.getName()));
+		}
+		List<String> privileges = getPrivileges(roles);
+		for (final String privilege : privileges) {
+			authorities.add(new SimpleGrantedAuthority(privilege));
+		}
+		return authorities;
+	}
+
+	/**
+	 * 根据角色返回权利集合
+	 * 
+	 * @param roles
+	 * @return
+	 */
+	private final List<String> getPrivileges(final Collection<Role> roles) {
+		final List<String> privileges = new ArrayList<String>();
+		final List<Privilege> collection = new ArrayList<Privilege>();
+		for (final Role role : roles) {
+			collection.addAll(role.getPrivileges());
+		}
+		for (final Privilege item : collection) {
+			privileges.add(item.getName());
+		}
+		return privileges;
+	}
+

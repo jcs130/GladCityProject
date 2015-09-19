@@ -14,7 +14,7 @@
 		<org.slf4j-version>1.7.12</org.slf4j-version>
 	</properties>
 	<dependencies>
-	
+
 		<!-- twitter4j -->
 		<dependency>
 			<groupId>org.twitter4j</groupId>
@@ -203,6 +203,7 @@
 					<mainClass>org.test.int1.Main</mainClass>
 				</configuration>
 			</plugin>
+
 		</plugins>
 	</build>
 </project>
