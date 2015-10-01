@@ -66,7 +66,7 @@ public class MySQLHelper_Mark implements DataSource{
 	public Connection getConnection(String username, String password)
 			throws SQLException {
 		// TODO Auto-generated method stub
-		return null;
+		return DriverManager.getConnection(url, username, password);// 获取连接
 	}
 
 	@Override

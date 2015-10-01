@@ -25,7 +25,7 @@ import com.zhongli.happycity.persistence.model.User;
 @RequestMapping(value = "/annotation")
 @Secured("ROLE_USER")
 public class markPage {
-	private static MessageDAO msgDAO = new MessageDAOimpl(100, 3);
+	
 
 	// 从数据库取twitterID
 	@RequestMapping("/getnewmessage")
@@ -43,7 +43,7 @@ public class markPage {
 		System.out.println("user:" + user_email + "lang:" + lang + "annotate_part" + annotate_part);
 
 		// 连接数据库获得数据
-		MarkMsg2Web ma = msgDAO.getOneNewMsg();
+		MarkMsg2Web ma = com.zhongli.happycity.Application.msgDAO.getOneNewMsg();
 		System.out.println("return:" + ma);
 		return ma;
 	}
@@ -62,7 +62,7 @@ public class markPage {
 		for (int i = 0; i < tmp.length; i++) {
 			medias.add(tmp[i]);
 		}
-		msgDAO.recordForMessage(user.getId(), msg_id, text_emotion, medias);
+		com.zhongli.happycity.Application.msgDAO.recordForMessage(user.getId(), msg_id, text_emotion, medias);
 		// 连接数据库更新数据，将标注记录加入到标注记录数据库
 		StatusMsg status = new StatusMsg(200, "Success");
 		return status;
@@ -71,7 +71,7 @@ public class markPage {
 	@RequestMapping("/getrecentannotation")
 	public ArrayList<MarkRecordObj> getRecentMarkedMsg(@AuthenticationPrincipal User user) {
 		
-		ArrayList<MarkRecordObj> recent = msgDAO.getRecentRecords(4,user.getId());
+		ArrayList<MarkRecordObj> recent = com.zhongli.happycity.Application.msgDAO.getRecentRecords(4,user.getId());
 
 //		System.out.println("\n\n"+recent1.get(0).getMark_at());
 //		System.out.println(recent.get(0).getEmotion_medias());
@@ -83,14 +83,14 @@ public class markPage {
 	@RequestMapping("/getrecordcount")
 	public int getMarkedMsgNumber(@AuthenticationPrincipal User user) {
 		
-		int count = msgDAO.getRecordCount(user.getId());
+		int count = com.zhongli.happycity.Application.msgDAO.getRecordCount(user.getId());
 		return count;
 	}
 	
 	@RequestMapping("/getallrecord")
 	public ArrayList<MarkRecordObj> getAllMarkedMsg(@AuthenticationPrincipal User user) {
 		
-		ArrayList<MarkRecordObj> all = msgDAO.getRecentRecords(0,user.getId());
+		ArrayList<MarkRecordObj> all = com.zhongli.happycity.Application.msgDAO.getRecentRecords(0,user.getId());
 
 		return all;
 	}

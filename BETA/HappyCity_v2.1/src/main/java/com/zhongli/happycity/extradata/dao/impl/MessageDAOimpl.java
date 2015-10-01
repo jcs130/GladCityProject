@@ -33,7 +33,7 @@ public class MessageDAOimpl implements MessageDAO {
 		markDB = new MySQLHelper_Mark();
 		this.cacheSize = cacheSize;
 		this.markMaxTime = markMaxTime;
-		
+
 		sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss Z yyyy", Locale.US);
 		sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
 	}
@@ -76,6 +76,7 @@ public class MessageDAOimpl implements MessageDAO {
 			}
 		}
 	}
+
 	/**
 	 * 检测消息是否还存在
 	 * 
@@ -115,7 +116,7 @@ public class MessageDAOimpl implements MessageDAO {
 
 	@Override
 	public MarkMsg2Web getOneNewMsg() {
-		String queryOption = "mark_times <" + markMaxTime ;
+		String queryOption = "mark_times <" + markMaxTime;
 		if (cacheMessage.size() == 0) {
 			// 若缓存中无数据，则获取新的数据
 			cacheMessage.addAll(getNewMarkingMsg(cacheSize, queryOption));
@@ -125,11 +126,10 @@ public class MessageDAOimpl implements MessageDAO {
 			index = 0;
 			cacheMessage.addAll(getNewMarkingMsg(cacheSize, queryOption));
 		}
-		MarkMsg2Web res= new MarkMsg2Web(cacheMessage.get(index));
+		MarkMsg2Web res = new MarkMsg2Web(cacheMessage.get(index));
 		index++;
 		return res;
 	}
-	
 
 	@Override
 	public void recordForMessage(long user_id, long message_id, String text_emotion, ArrayList<String> media_emotion) {
@@ -137,8 +137,9 @@ public class MessageDAOimpl implements MessageDAO {
 		message = getMessageInfo(message_id);
 		// insert into mark_records
 		PreparedStatement ps = null;
+		Connection conn = null;
 		try {
-			Connection conn = markDB.getConnection();
+			conn = markDB.getConnection();
 
 			String sqlString = "INSERT INTO mark_records "
 					+ "(msg_id, user_id, mark_at, text, emotion_text, media_types, media_urls, media_urls_local, emotion_medias) VALUES"
@@ -148,87 +149,115 @@ public class MessageDAOimpl implements MessageDAO {
 			ps.setLong(2, user_id);
 			ps.setString(3, message.getText());
 			ps.setString(4, text_emotion);
-			
+
 			ps.setString(5, message.getMedia_types().toString());
 			ps.setString(6, message.getMedia_urls().toString());
 			ps.setString(7, message.getMedia_urls_local().toString());
 			ps.setString(8, media_emotion.toString());
-			
+
 			ps.execute();
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				ps.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			if (conn != null) {
+				try {
+					conn.close();
+				} catch (SQLException e) {
+				}
+			}
 		}
-		try {
-			ps.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		
-		//update mark_messages
+
+		// update mark_messages
 		updateMarkMessage(message_id);
-		//update user_details, message_id, updatetime
+		// update user_details, message_id, updatetime
 		updateUserDetail(message_id, user_id);
 	}
-	
+
 	@Override
-	public void updateMarkMessage(long message_id){
+	public void updateMarkMessage(long message_id) {
 		PreparedStatement ps = null;
 		String sqlString = "UPDATE mark_messages SET mark_times = mark_times + 1 WHERE msg_id = ?;";
-		try{
-			Connection conn = markDB.getConnection();
+		Connection conn = null;
+		try {
+			conn = markDB.getConnection();
 			ps = conn.prepareStatement(sqlString);
 			ps.setLong(1, message_id);
 			ps.execute();
-		}
-		catch (SQLException e) {
-			e.printStackTrace();
-		}
-		try {
-			ps.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				ps.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			if (conn != null) {
+				try {
+					conn.close();
+				} catch (SQLException e) {
+				}
+			}
 		}
 	}
-	
+
 	@Override
-	public void createUserDetail(long user_id){
+	public void createUserDetail(long user_id) {
 		PreparedStatement ps = null;
 		String sqlString = "INSERT user_details (user_id, updated_on) VALUES (?, NOW());";
+		Connection conn = null;
 		try {
-			Connection conn = markDB.getConnection();
+			conn = markDB.getConnection();
 			ps = conn.prepareStatement(sqlString);
 			ps.setLong(1, user_id);
 			ps.execute();
-		}
-		catch (SQLException e) {
-			e.printStackTrace();
-		}
-		try {
-			ps.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				ps.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			if (conn != null) {
+				try {
+					conn.close();
+				} catch (SQLException e) {
+				}
+			}
 		}
 	}
-	
+
 	@Override
-	public void updateUserDetail(long message_id, long user_id){
+	public void updateUserDetail(long message_id, long user_id) {
 		PreparedStatement ps = null;
 		String sqlString = "UPDATE user_details SET last_recorded_message_id = ?, updated_on = NOW()"
 				+ " WHERE user_id = ?;";
+		Connection conn = null;
 		try {
-			Connection conn = markDB.getConnection();
+			conn = markDB.getConnection();
 			ps = conn.prepareStatement(sqlString);
 			ps.setLong(1, message_id);
 			ps.setLong(2, user_id);
 			ps.execute();
-		}
-		catch (SQLException e) {
-			e.printStackTrace();
-		}
-		try {
-			ps.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				ps.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			if (conn != null) {
+				try {
+					conn.close();
+				} catch (SQLException e) {
+				}
+			}
 		}
 	}
 
@@ -236,8 +265,9 @@ public class MessageDAOimpl implements MessageDAO {
 	public MarkMessageObj getMessageInfo(long message_id) {
 		MarkMessageObj message = new MarkMessageObj();
 		PreparedStatement ps = null;
+		Connection conn = null;
 		try {
-			Connection conn = markDB.getConnection();
+			conn = markDB.getConnection();
 
 			String sqlString = "SELECT * FROM mark_messages WHERE msg_id = ?;";
 			ps = conn.prepareStatement(sqlString);
@@ -260,23 +290,30 @@ public class MessageDAOimpl implements MessageDAO {
 
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}
-		try {
-			ps.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
+		} finally {
+			try {
+				ps.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			if (conn != null) {
+				try {
+					conn.close();
+				} catch (SQLException e) {
+				}
+			}
 		}
 		return message;
 	}
-	
-	
+
 	@Override
-	public ArrayList<MarkRecordObj> getRecentRecords(int count, long user_id){
+	public ArrayList<MarkRecordObj> getRecentRecords(int count, long user_id) {
 		MarkRecordObj record;
 		ArrayList<MarkRecordObj> records = new ArrayList<MarkRecordObj>();
 		PreparedStatement ps = null;
+		Connection conn = null;
 		try {
-			Connection conn = markDB.getConnection();
+			conn = markDB.getConnection();
 			String sqlString = "SELECT * FROM mark_records WHERE user_id = ? ORDER BY mark_at DESC";
 			if (count == 0) {
 				sqlString += ";";
@@ -289,15 +326,14 @@ public class MessageDAOimpl implements MessageDAO {
 				ps.setInt(2, count);
 			}
 			ResultSet rs = ps.executeQuery();
-			SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			while(rs.next()){
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			while (rs.next()) {
 				record = new MarkRecordObj();
 				record.setEmotion_medias(getListFromString(rs.getString("emotion_medias")));
 				record.setEmotion_text(rs.getString("emotion_text"));
 				record.setMark_at(sdf.parse(rs.getString("mark_at")));
 				record.setMedia_types(getListFromString(rs.getString("media_types")));
-				record.setMedia_urls(getListFromString(rs.getString("media_urls")));
-				record.setMedia_urls_local(getListFromString(rs.getString("media_urls_local")));;
+				record.setMedia_urls(getListFromString(rs.getString("media_urls_local")));
 				record.setMsg_id(rs.getLong("msg_id"));
 				record.setRecord_id(rs.getInt("record_id"));
 				record.setText(rs.getString("text"));
@@ -309,20 +345,28 @@ public class MessageDAOimpl implements MessageDAO {
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-		try {
-			ps.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
+		} finally {
+			try {
+				ps.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			if (conn != null) {
+				try {
+					conn.close();
+				} catch (SQLException e) {
+				}
+			}
 		}
 		return records;
 	}
 
-	public int getRecordCount(long user_id){
+	public int getRecordCount(long user_id) {
 		PreparedStatement ps = null;
 		int count = 0;
+		Connection conn = null;
 		try {
-			Connection conn = markDB.getConnection();
+			conn = markDB.getConnection();
 			String sqlString = "SELECT count(*) FROM mark_records WHERE user_id = ?";
 			ps = conn.prepareStatement(sqlString);
 			ps.setLong(1, user_id);
@@ -332,11 +376,18 @@ public class MessageDAOimpl implements MessageDAO {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}
-		try {
-			ps.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
+		} finally {
+			try {
+				ps.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			if (conn != null) {
+				try {
+					conn.close();
+				} catch (SQLException e) {
+				}
+			}
 		}
 		return count;
 	}

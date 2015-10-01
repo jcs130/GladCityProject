@@ -1,17 +1,13 @@
 package com.zhongli.happycity.web.controller;
 
 import java.util.Calendar;
-import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-import com.zhongli.happycity.extradata.dao.MessageDAO;
-import com.zhongli.happycity.extradata.dao.impl.MessageDAOimpl;
 import com.zhongli.happycity.persistence.model.PasswordResetToken;
-import com.zhongli.happycity.persistence.model.Role;
 import com.zhongli.happycity.persistence.model.User;
 import com.zhongli.happycity.persistence.model.VerificationToken;
 import com.zhongli.happycity.persistence.service.IUserService;
@@ -107,8 +103,8 @@ public class RegistrationController {
         userService.saveRegisteredUser(user);
         model.addAttribute("message", messages.getMessage("message.accountVerified", null, locale));
         // insert one row in user_details
-        MessageDAO msgDAO = new MessageDAOimpl(20, 3);
-        msgDAO.createUserDetail(user.getId());
+       // MessageDAO msgDAO = new MessageDAOimpl(20, 3);
+        com.zhongli.happycity.Application.msgDAO.createUserDetail(user.getId());
         
         return "redirect:/login.html?lang=" + locale.getLanguage();
     }

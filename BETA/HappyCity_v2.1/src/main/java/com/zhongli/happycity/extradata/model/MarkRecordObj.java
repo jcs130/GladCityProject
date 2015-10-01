@@ -21,8 +21,6 @@ public class MarkRecordObj {
 	private List<String> media_types;
 	// Media urls
 	private List<String> media_urls;
-	// Local media url
-	private List<String> media_urls_local;
 	// emotion of medias
 	private List<String> emotion_medias;
 	public int getRecord_id() {
@@ -74,12 +72,6 @@ public class MarkRecordObj {
 	public void setMedia_urls(List<String> media_urls) {
 		this.media_urls = media_urls;
 	}
-	public List<String> getMedia_urls_local() {
-		return media_urls_local;
-	}
-	public void setMedia_urls_local(List<String> media_urls_local) {
-		this.media_urls_local = media_urls_local;
-	}
 	public List<String> getEmotion_medias() {
 		return emotion_medias;
 	}
@@ -90,7 +82,7 @@ public class MarkRecordObj {
 	public String toString() {
 		return "MarkRecordObj [record_id=" + record_id + ", msg_id=" + msg_id + ", user_id=" + user_id + ", mark_at="
 				+ mark_at + ", text=" + text + ", emotion_text=" + emotion_text + ", media_types=" + media_types
-				+ ", media_urls=" + media_urls + ", media_urls_local=" + media_urls_local + ", emotion_medias="
+				+ ", media_urls=" + media_urls + ", emotion_medias="
 				+ emotion_medias + "]";
 	}
 	

@@ -291,6 +291,14 @@
 																		+ "</span></td></tr>");
 												num = num + 1;
 											});
+							$("#example1").DataTable({
+								"paging" : true,
+								"lengthChange" : true,
+								"searching" : false,
+								"ordering" : false,
+								"info" : true,
+								"autoWidth" : true
+							});
 
 							$.each($(".emotion"), function() {
 								switch ($(this).html()) {
@@ -307,19 +315,9 @@
 									break;
 								}
 							});
-							
-							$("#example1").DataTable({
-								"paging" : true,
-								"lengthChange" : true,
-								"searching" : false,
-								"ordering" : false,
-								"info" : true,
-								"autoWidth" : true
-							});
 
 						}
 					});
-			 
 
 		});
 	</script>
