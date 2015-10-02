@@ -235,7 +235,7 @@ public class MessageDAOimpl implements MessageDAO {
 	@Override
 	public void updateUserDetail(long message_id, long user_id) {
 		PreparedStatement ps = null;
-		String sqlString = "UPDATE user_details SET last_recorded_message_id = ?, updated_on = NOW()"
+		String sqlString = "UPDATE user_details SET last_recorded_message_id = ?,count=count+1 , updated_on = NOW()"
 				+ " WHERE user_id = ?;";
 		Connection conn = null;
 		try {
@@ -361,6 +361,32 @@ public class MessageDAOimpl implements MessageDAO {
 		return records;
 	}
 
+	private void updateRecordCount(long user_id, int count) {
+		PreparedStatement ps = null;
+		String sqlString = "UPDATE user_details SET count=" + count + " WHERE user_id = ?;";
+		Connection conn = null;
+		try {
+			conn = markDB.getConnection();
+			ps = conn.prepareStatement(sqlString);
+			ps.setLong(1, user_id);
+			ps.execute();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				ps.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			if (conn != null) {
+				try {
+					conn.close();
+				} catch (SQLException e) {
+				}
+			}
+		}
+	}
+
 	public int getRecordCount(long user_id) {
 		PreparedStatement ps = null;
 		int count = 0;
@@ -368,6 +394,8 @@ public class MessageDAOimpl implements MessageDAO {
 		try {
 			conn = markDB.getConnection();
 			String sqlString = "SELECT count(*) FROM mark_records WHERE user_id = ?";
+			// String sqlString = "SELECT count FROM user_details WHERE user_id
+			// = ?";
 			ps = conn.prepareStatement(sqlString);
 			ps.setLong(1, user_id);
 			ResultSet rs = ps.executeQuery();
@@ -389,6 +417,7 @@ public class MessageDAOimpl implements MessageDAO {
 				}
 			}
 		}
+		updateRecordCount(user_id, count);
 		return count;
 	}
 }
