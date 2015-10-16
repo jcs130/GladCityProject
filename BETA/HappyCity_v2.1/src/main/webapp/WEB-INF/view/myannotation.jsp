@@ -9,11 +9,12 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<title>Digital City Impulse</title>
+<title>Digital City Impulse | My Annotation</title>
 <!-- Tell the browser to be responsive to screen width -->
 <meta
 	content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
 	name="viewport">
+
 <!-- Bootstrap 3.3.5 -->
 <link rel="stylesheet" href="resources/bootstrap/css/bootstrap.min.css">
 <!-- Font Awesome -->
@@ -24,30 +25,20 @@
 	href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
 <!-- Theme style -->
 <link rel="stylesheet" href="resources/dist/css/AdminLTE.min.css">
-<!-- AdminLTE Skins. We have chosen the skin-blue for this starter
-          page. However, you can choose any other skin. Make sure you
-          apply the skin class to the body tag so the changes take effect.
-    -->
+<!-- AdminLTE Skin-->
 <link rel="stylesheet" href="resources/dist/css/skins/skin-blue.min.css">
 
-<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-<!--[if lt IE 9]>
-        <script src="resources/js/html5shiv.min.js"></script>
-        <script src="resources/js/1.4.2/respond.min.js"></script>
-    <![endif]-->
 <!-- DataTables -->
-<link rel="stylesheet"
-	href="resources/plugins/datatables/dataTables.bootstrap.css">
+<link rel="stylesheet" href="resources/plugins/datatables/dataTables.bootstrap.css">
 <!-- Select2 -->
 <link rel="stylesheet" href="resources/plugins/select2/select2.min.css">
 <!-- iCheck for checkboxes and radio inputs -->
 <link rel="stylesheet" href="resources/plugins/iCheck/all.css">
-
 <!-- Owl Carousel Assets -->
 <link href="resources/owl-carousel/owl.carousel.css" rel="stylesheet">
 <link href="resources/owl-carousel/owl.theme.css" rel="stylesheet">
 <link href="resources/owl-carousel/owl.transitions.css" rel="stylesheet">
+
 
 <style>
 .annotation-img {
@@ -105,7 +96,7 @@
 								<!-- Menu Footer-->
 								<li class="user-footer">
 									<div class="pull-left">
-										<!-- 										<a href="#" class="btn btn-default btn-flat">Profile</a> -->
+										<!-- <a href="#" class="btn btn-default btn-flat">Profile</a> -->
 									</div>
 									<div class="pull-right">
 										<a class="btn btn-default btn-flat"
@@ -119,9 +110,9 @@
 				</div>
 			</nav>
 		</header>
+		
 		<!-- Left side column. contains the logo and sidebar -->
 		<aside class="main-sidebar">
-
 			<!-- sidebar: style can be found in sidebar.less -->
 			<section class="sidebar">
 
@@ -137,10 +128,9 @@
 							<sec:authentication property="principal.lastName" />
 						</p>
 						<!-- Status -->
-						<!-- 						<a href="#"><i class="fa fa-circle text-success"></i> Online</a> -->
+						<!-- <a href="#"><i class="fa fa-circle text-success"></i> Online</a> -->
 					</div>
 				</div>
-
 
 				<!-- Sidebar Menu -->
 				<ul class="sidebar-menu">
@@ -153,17 +143,18 @@
 							<span>My Regions</span></a></li>
 					<li><a href="comingsoon.html"><i class="fa fa-area-chart"></i>
 							<span>My Analysis</span></a></li>
-					<li class="active"><a href="myannotation.html"><i
-							class="fa fa-files-o"></i> <span>My Annotation</span></a></li>
+					<li class="active"><a href="myannotation.html"><i class="fa fa-files-o"></i>
+							<span>My Annotation</span></a></li>
 					<li class="header">SYSTEM</li>
 					<li><a href="comingsoon.html"><i class="fa fa-map-marker"></i>
 							<span>Msg on map</span></a></li>
 					<li><a href="comingsoon.html"><i class="fa fa-bar-chart"></i>
-							<span>Data Anlysis</span></a></li>
-					<li><a href="annotation_domjs.html"><i class="fa fa-book"></i>
-							<span>Corpus Annotation</span></a></li>
+							<span>Data Analysis</span></a></li>
+					<li><a href="annotation_domjs.html"><i
+							class="fa fa-book"></i> <span>Corpus Annotation</span></a></li>
 				</ul>
 				<!-- /.sidebar-menu -->
+
 			</section>
 			<!-- /.sidebar -->
 		</aside>
@@ -202,7 +193,6 @@
 												</tr>
 											</thead>
 											<tbody id="annotation-history">
-
 											</tbody>
 										</table>
 								<!-- 	</div>
@@ -219,6 +209,9 @@
 			<!-- /.content -->
 		</div>
 		<!-- /.content-wrapper -->
+		
+		
+		<!-- Main Footer -->
 		<footer class="main-footer">
 			<div class="pull-right hidden-xs">
 				<b>Version</b> Beta 1.1.0
@@ -227,14 +220,10 @@
 					Studio</a>.
 			</strong>
 		</footer>
-
-
-		<!-- Add the sidebar's background. This div must be placed
-           immediately after the control sidebar -->
-
 	</div>
 	<!-- ./wrapper -->
-
+	
+	<!----------------- REQUIRED JS SCRIPTS --------------------->
 	<!-- jQuery 2.1.4 -->
 	<script src="resources/plugins/jQuery/jQuery-2.1.4.min.js"></script>
 	<!-- Bootstrap 3.3.5 -->
@@ -251,77 +240,7 @@
 	<script src="resources/dist/js/app.min.js"></script>
 	<!-- AdminLTE for demo purposes -->
 	<script src="resources/dist/js/demo.js"></script>
-	<!-- page script -->
-	<script>
-		$(function() {
-			/* 			$("#example1").DataTable({
-			 "paging" : true,
-			 "lengthChange" : true,
-			 "searching" : false,
-			 "ordering" : false,
-			 "info" : true,
-			 "autoWidth" : true
-			 }); */
-
-			$
-					.ajax({
-						type : "GET",
-						url : "annotation/getallrecord",
-						data : {},
-						dataType : "json",
-						success : function(data, textStatus) {
-							var num = 1;
-							$
-									.each(
-											data,
-											function() {
-												//alert(this.emotion_medias[0]);
-												$("#annotation-history")
-														.append(
-																"<tr><td>"
-																		+ num
-																		+ "</td><td>"
-																		+ this.mark_at
-																		+ "</td><td>"
-																		+ this.text
-																		+ "</td><td><span class='label emotion'>"
-																		+ this.emotion_text
-																		+ "</span></td><td><img src='"+this.media_urls[0]+"' class='annotation-img' alt='Product Image'></td><td><span class='label emotion'>"
-																		+ this.emotion_medias[0]
-																		+ "</span></td></tr>");
-												num = num + 1;
-											});
-
-							$.each($(".emotion"), function() {
-								switch ($(this).html()) {
-								case "positive":
-									$(this).addClass("label-success");
-									break;
-								case "neutral":
-									$(this).addClass("label-warning");
-									break;
-								case "negative":
-									$(this).addClass("label-danger");
-									break;
-								default:
-									break;
-								}
-							});
-							
-							$("#example1").DataTable({
-								"paging" : true,
-								"lengthChange" : true,
-								"searching" : false,
-								"ordering" : false,
-								"info" : true,
-								"autoWidth" : true
-							});
-
-						}
-					});
-			 
-
-		});
-	</script>
+	<!--operation when this page is ready-->
+	<script src="resources/dist/js/myannotation.js"></script>
 </body>
 </html>
