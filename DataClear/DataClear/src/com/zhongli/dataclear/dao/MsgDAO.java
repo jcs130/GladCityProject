@@ -16,11 +16,11 @@ public interface MsgDAO {
 	/**
 	 * 查询mark_messages标注记录大于2次的记录 SELECT msg_id FROM happycityweb.mark_messages
 	 * where mark_times>2;
-	 * 
+	 * @param option
 	 * @param mark_time
 	 * @return
 	 */
-	public ArrayList<Long> getMsgIDByTimes(int mark_time);
+	public ArrayList<Long> getMsgIDByTimes(int option,int mark_time);
 
 	/**
 	 * 对每条记录查询mark_records表 SELECT * FROM happycityweb.mark_records where

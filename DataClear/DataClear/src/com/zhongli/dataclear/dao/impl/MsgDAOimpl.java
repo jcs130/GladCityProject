@@ -12,11 +12,17 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import com.zhongli.dataclear.dao.MsgDAO;
+import com.zhongli.dataclear.model.MarkMessage;
 import com.zhongli.dataclear.model.MarkRecord;
 
 public class MsgDAOimpl implements MsgDAO {
 	private MySQLHelper_Mark markDB;
 	private SimpleDateFormat sdf;
+	public static final int EQUAL = 0;
+	public static final int GREATER_ADN_EQUAL = 3;
+	public static final int LESS_AND_EQUAL = 4;
+	public static final int LESS = 2;
+	public static final int GREATER = 1;
 
 	public MsgDAOimpl() {
 		markDB = new MySQLHelper_Mark();
@@ -25,10 +31,24 @@ public class MsgDAOimpl implements MsgDAO {
 	}
 
 	@Override
-	public ArrayList<Long> getMsgIDByTimes(int mark_time) {
+	public ArrayList<Long> getMsgIDByTimes(int option, int mark_time) {
 		// and media_type !='[]'
-		String sqlString = "SELECT msg_id FROM mark_messages where mark_times>"
-				+ mark_time + " and msg_id>16659;";
+		String optionStr = "";
+		if (option == EQUAL) {
+			optionStr = "=";
+		} else if (option == GREATER) {
+			optionStr = ">";
+		} else if (option == GREATER_ADN_EQUAL) {
+			optionStr = ">=";
+		} else if (option == LESS) {
+			optionStr = "<";
+		} else if (option == LESS_AND_EQUAL) {
+			optionStr = "<=";
+		} else {
+			optionStr = ">";
+		}
+		String sqlString = "SELECT msg_id FROM mark_messages where mark_times"
+				+ optionStr + mark_time + ";";
 		// System.out.println(sqlString);
 		Connection conn = null;
 
@@ -40,7 +60,7 @@ public class MsgDAOimpl implements MsgDAO {
 			while (rs.next()) {
 				long id = rs.getLong("msg_id");
 				res.add(id);
-				System.out.println("msg_id:"+id);
+				System.out.println("msg_id:" + id);
 			}
 			return res;
 		} catch (SQLException e) {
@@ -253,6 +273,45 @@ public class MsgDAOimpl implements MsgDAO {
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
+		} finally {
+			if (conn != null) {
+				try {
+					conn.close();
+				} catch (SQLException e) {
+				}
+			}
+		}
+	}
+
+	public ArrayList<MarkMessage> getAllMarkMessages() {
+		// and media_type !='[]'
+		String sqlString = "SELECT * FROM mark_messages;";
+		Connection conn = null;
+		try {
+			conn = markDB.getConnection();
+			PreparedStatement ps = conn.prepareStatement(sqlString);
+			ArrayList<MarkMessage> res = new ArrayList<MarkMessage>();
+			MarkMessage message;
+			ResultSet rs = ps.executeQuery();
+			while (rs.next()) {
+				message = new MarkMessage();
+				message.setMsg_id(rs.getLong("msg_id"));
+				message.setText(rs.getString("text"));
+				message.setMedia_types(getListFromString(rs
+						.getString("media_types")));
+				message.setMedia_urls(getListFromString(rs
+						.getString("media_urls")));
+				message.setMedia_urls_local(getListFromString(rs
+						.getString("media_urls_local")));
+				message.setMark_times(rs.getInt("mark_times"));
+				System.out.println(message);
+				res.add(message);
+			}
+			// System.out.println("Get new Datas");
+			return res;
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+
 		} finally {
 			if (conn != null) {
 				try {

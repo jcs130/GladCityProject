@@ -10,13 +10,13 @@ import java.util.logging.Logger;
 import javax.sql.DataSource;
 
 public class MySQLHelper_Mark implements DataSource{
-//	private static final String url = "jdbc:mysql://localhost:3307/happycityweb";
-	private static final String url = "jdbc:mysql://mydatatest.cqkitdz1e3ma.us-west-2.rds.amazonaws.com:3306/happycityweb";
+	private static final String url = "jdbc:mysql://localhost:3307/happycityweb";
+//	private static final String url = "jdbc:mysql://mydatatest.cqkitdz1e3ma.us-west-2.rds.amazonaws.com:3306/happycityweb";
 	private static final String name = "com.mysql.jdbc.Driver";
-//	private static final String user = "root";
-	private static final String user = "jcs130";
-//	private static final String password = "";
-	private static final String password = "jcsss130";
+	private static final String user = "root";
+//	private static final String user = "jcs130";
+	private static final String password = "";
+//	private static final String password = "jcsss130";
 
 	@Override
 	public PrintWriter getLogWriter() throws SQLException {
