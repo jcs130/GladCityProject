@@ -24,7 +24,6 @@ public class DataClearMain {
 	}
 
 	private void countUnDone() {
-		FileOutputStream fos;
 		MsgDAOimpl dao = new MsgDAOimpl();
 		ArrayList<Long> allSame_text = new ArrayList<Long>();
 		ArrayList<Long> oneDifferent_text = new ArrayList<Long>();

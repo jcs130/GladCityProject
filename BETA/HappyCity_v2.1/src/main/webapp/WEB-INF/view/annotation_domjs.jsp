@@ -42,6 +42,13 @@
 
 <link rel="stylesheet" href="resources/dist/css/annotation.css">
 
+<style>
+body .modal {
+	/* Workaround for https://github.com/twbs/bootstrap/issues/14839. */
+	-webkit-overflow-scrolling: auto;
+}
+</style>
+
 </head>
 
 
@@ -304,51 +311,48 @@
 	<div class="example-modal modal fade" id="annotation-modal"
 		tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
 		aria-hidden="true">
-		<div class="modal">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<button type="button" class="close" data-dismiss="modal"
-							aria-label="Close" id="btn-closemaodal">
-							<span aria-hidden="true">&times;</span>
-						</button>
-						<h4 class="modal-title">
-							Annotation Module<span class="pull-right" aria-hidden="true">&nbsp;&nbsp;</span><span
-								class="label label-success pull-right" id="this-counter">0</span>
-						</h4>
-					</div>
-					<!-- /.modal-header -->
-
-					<div class="modal-body">
-						<div class="container-fluid">
-							<div class="row">
-								<ul class="nav">
-									<li><div class="row">
-											<div id="annotation" class="col-md-12">
-												<div id="owl-demo" class="owl-carousel"></div>
-												<!--/.owl-demo-->
-											</div>
-											<!-- /.col-md-12 -->
-										</div></li>
-								</ul>
-							</div>
-						</div>
-						<!-- /.container-fluid -->
-					</div>
-					<!-- /.modal-body -->
-
-					<div class="modal-footer">
-						<button type="button" id="btn-skip"
-							class="btn btn-danger btnnn pull-left">&nbsp;Skip&nbsp;</button>
-						<button type="button" id="btn-next" class="btn btn-success btnnn">Submit</button>
-					</div>
-					<!-- /.modal-footer -->
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close" id="btn-closemaodal">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title">
+						Annotation Module<span class="pull-right" aria-hidden="true">&nbsp;&nbsp;</span><span
+							class="label label-success pull-right" id="this-counter">0</span>
+					</h4>
 				</div>
-				<!-- /.modal-content -->
+				<!-- /.modal-header -->
+
+				<div class="modal-body">
+					<div class="container-fluid">
+						<div class="row">
+							<ul class="nav">
+								<li><div class="row">
+										<div id="annotation" class="col-md-12">
+											<div id="owl-demo" class="owl-carousel"></div>
+											<!--/.owl-demo-->
+										</div>
+										<!-- /.col-md-12 -->
+									</div></li>
+							</ul>
+						</div>
+					</div>
+					<!-- /.container-fluid -->
+				</div>
+				<!-- /.modal-body -->
+
+				<div class="modal-footer">
+					<button type="button" id="btn-skip"
+						class="btn btn-danger btnnn pull-left">&nbsp;Skip&nbsp;</button>
+					<button type="button" id="btn-next" class="btn btn-success btnnn">Submit</button>
+				</div>
+				<!-- /.modal-footer -->
 			</div>
-			<!-- /.modal-dialog -->
+			<!-- /.modal-content -->
 		</div>
-		<!-- /.modal -->
+		<!-- /.modal-dialog -->
 	</div>
 	<!-- /.example-modal -->
 
@@ -382,6 +386,8 @@
 
 	<!--operation when this page is ready-->
 	<script src="resources/dist/js/annotation.js"></script>
+
+
 
 
 
