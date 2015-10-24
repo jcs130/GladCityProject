@@ -274,7 +274,7 @@ body .modal {
 							</div>
 							<!-- /.box-body -->
 							<div class="box-footer text-center">
-								<a href="/happycity/myannotation.html"
+								<a href="myannotation.html"
 									class="uppercase recent-count">View All Annotation History</a>
 							</div>
 							<!-- /.box-footer -->
